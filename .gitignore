@@ -1,0 +1,13 @@
+##########################
+# Unreal Generated Files #
+##########################
+
+
+**/Intermediate/
+**/Build/
+**/Binaries/
+**/DerivedDataCache/
+**/Saved/
+01_Tutorial/Tutorial_01/Content/Level_01_BuiltData.uasset
+01_Tutorial/Tutorial_01/.vs/Tutorial_01/v15/Solution.VC.db
+01_Tutorial/Tutorial_01/.vs/Tutorial_01/v15/Browse.VC.db
