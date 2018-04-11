@@ -8,7 +8,6 @@ public class Tutorial_01Target : TargetRules
 	public Tutorial_01Target(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-
 		ExtraModuleNames.AddRange( new string[] { "Tutorial_01" } );
 	}
 }

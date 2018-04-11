@@ -8,7 +8,6 @@ public class Tutorial_01EditorTarget : TargetRules
 	public Tutorial_01EditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-
 		ExtraModuleNames.AddRange( new string[] { "Tutorial_01" } );
 	}
 }
