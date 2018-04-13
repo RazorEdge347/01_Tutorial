@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "OpenDoor.h"
 #include "GameFramework/Actor.h"
-
+#include "Engine/World.h"
 
 
 // Sets default values for this component's properties
@@ -20,13 +20,19 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Find the owning Actor
-	AActor *Owner = GetOwner();
-	// Value of the Rotation (Pitch , Yawn, Roll)
-	FRotator NewRotation = FRotator(0.0f, 90.0f ,0.0f);
-	//Apllies Rotation
-	Owner->SetActorRotation(NewRotation);
+	Actorthatopens = GetWorld()->GetFirstPlayerController()->GetPawn();
+}
+
+void UOpenDoor::OpenDoor()
+{
+	Owner->SetActorRotation(FRotator(0.0f, 90.0f, 0.0f));
+}
+
+void UOpenDoor::CloseDoor()
+{	
 	
+	//Apllies Rotation
+	Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -35,6 +41,15 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+
+	if (PressurePlate->IsOverlappingActor(Actorthatopens) == true) {
+		OpenDoor();
+		lastdooropentime = GetWorld()->GetTimeSeconds();
+
+	}
+
+	if (GetWorld()->GetTimeSeconds() - lastdooropentime > delaytime)
+		CloseDoor();
+
 }
 
