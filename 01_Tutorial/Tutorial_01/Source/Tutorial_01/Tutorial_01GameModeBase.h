@@ -14,7 +14,4 @@ class TUTORIAL_01_API ATutorial_01GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-	
-	
-	
 };
