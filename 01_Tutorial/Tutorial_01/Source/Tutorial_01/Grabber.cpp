@@ -37,7 +37,6 @@ void UGrabber::Grab() {
 	auto ActorHit = HitResult.GetActor();
 	if(ActorHit)
 	PhysicsHandle->GrabComponent(GrabedComponent, NAME_None, GrabedComponent->GetOwner()->GetActorLocation(), true);
-
 }
 
 void UGrabber::Release() {
@@ -48,8 +47,6 @@ void UGrabber::Release() {
 ///Input Component verification
 void UGrabber::VerifyInputComponent()
 {
-	
-
 	if (InputComponent) {
 		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
@@ -65,17 +62,15 @@ void UGrabber::VerifyPhysicsHandle()
 {
 	
 	if (PhysicsHandle) {
-
+		return;
 	}
 	else {
 		UE_LOG(LogTemp, Error, TEXT("%s is missing that specific component"), *GetOwner()->GetName());
 	}
 }
 
-const FHitResult UGrabber::GetFirstHitReach()
+FTwoVectors UGrabber::GetTraceEnd()
 {
-
-
 	FVector PlayerLocation;
 	FRotator PlayerRotation;
 
@@ -83,12 +78,16 @@ const FHitResult UGrabber::GetFirstHitReach()
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
 
 	UE_LOG(LogTemp, Warning, TEXT("Location : %s , Roatation : %s"), *PlayerLocation.ToString(), *PlayerRotation.ToString());
-	FVector TraceEnd = PlayerLocation + PlayerRotation.Vector()*100.f;
 
-	DrawDebugLine(GetWorld(), PlayerLocation, TraceEnd, FColor(255, 0, 0), false, 0.f, 0.f, 2.f);
+	FVector TraceEnd = PlayerLocation + PlayerRotation.Vector()*100.f;
+	return FTwoVectors(PlayerLocation, TraceEnd);
+}
+
+const FHitResult UGrabber::GetFirstHitReach()
+{
 	FHitResult Linetracehit;
 
-	GetWorld()->LineTraceSingleByObjectType(OUT Linetracehit, PlayerLocation, TraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), FCollisionQueryParams(FName(TEXT("")), false, GetOwner()));
+	GetWorld()->LineTraceSingleByObjectType(OUT Linetracehit, GetTraceEnd().v1, GetTraceEnd().v2, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), FCollisionQueryParams(FName(TEXT("")), false, GetOwner()));
 
 	AActor *FoundActor = Linetracehit.GetActor();
 
@@ -109,17 +108,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FVector PlayerLocation;
-	FRotator PlayerRotation;
-
-	// Gets the player ViewPoint (Location, Rotation)
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
-	FVector TraceEnd = PlayerLocation + PlayerRotation.Vector()*100.f;
-
-	if (PhysicsHandle->GrabbedComponent) {
-		PhysicsHandle->SetTargetLocation(TraceEnd);
-	}
-
-
+	if (PhysicsHandle->GrabbedComponent) 
+		PhysicsHandle->SetTargetLocation(GetTraceEnd().v2);
 }
 

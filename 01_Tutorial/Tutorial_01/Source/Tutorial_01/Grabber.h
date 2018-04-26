@@ -31,11 +31,12 @@ public:
 private:
 	UPhysicsHandleComponent *PhysicsHandle = nullptr;
 	UInputComponent *InputComponent = nullptr;
-
 	void Grab();
 	void Release();
 	void VerifyInputComponent();
 	void VerifyPhysicsHandle();
+	//Gets the vector PlayerLocation(1) and Trace end(2)
+	FTwoVectors GetTraceEnd();
 	//Get FHitResult from tracing the object in front
 	const FHitResult GetFirstHitReach();
 };
