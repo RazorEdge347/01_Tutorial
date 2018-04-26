@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Grabber.h"
-
 #include "Engine/World.h"
-#include "DrawDebugHelpers.h"
+
 
 #define OUT
 // Sets default values for this component's properties
@@ -22,17 +21,60 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	///Look for attached Physic Handle
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+
+	VerifyInputComponent();
+	VerifyPhysicsHandle();
 	
 }
 
+void UGrabber::Grab() {
+	UE_LOG(LogTemp, Warning, TEXT("Grab is pressed"));
+	auto HitResult = GetFirstHitReach(); 
+	auto GrabedComponent = HitResult.GetComponent();
+	auto ActorHit = HitResult.GetActor();
+	if(ActorHit)
+	PhysicsHandle->GrabComponent(GrabedComponent, NAME_None, GrabedComponent->GetOwner()->GetActorLocation(), true);
 
-// Called every frame
-void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+}
+
+void UGrabber::Release() {
+	UE_LOG(LogTemp, Warning, TEXT("Grab is Released"));
+	PhysicsHandle->ReleaseComponent();
+}
+
+///Input Component verification
+void UGrabber::VerifyInputComponent()
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
 
-	// Each Frame
+	if (InputComponent) {
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("%s is missing that specific component"), *GetOwner()->GetName());
+	}
+
+}
+
+///Physics Handle Component
+void UGrabber::VerifyPhysicsHandle()
+{
+	
+	if (PhysicsHandle) {
+
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("%s is missing that specific component"), *GetOwner()->GetName());
+	}
+}
+
+const FHitResult UGrabber::GetFirstHitReach()
+{
+
 
 	FVector PlayerLocation;
 	FRotator PlayerRotation;
@@ -41,14 +83,14 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
 
 	UE_LOG(LogTemp, Warning, TEXT("Location : %s , Roatation : %s"), *PlayerLocation.ToString(), *PlayerRotation.ToString());
-	FVector LineTraceEnd = PlayerLocation + PlayerRotation.Vector()*100.f; 
+	FVector TraceEnd = PlayerLocation + PlayerRotation.Vector()*100.f;
 
-	DrawDebugLine(GetWorld(), PlayerLocation, LineTraceEnd, FColor(255, 0, 0), false, 0.f, 0.f, 2.f);
+	DrawDebugLine(GetWorld(), PlayerLocation, TraceEnd, FColor(255, 0, 0), false, 0.f, 0.f, 2.f);
 	FHitResult Linetracehit;
 
-	GetWorld()->LineTraceSingleByObjectType(OUT Linetracehit, PlayerLocation, LineTraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), FCollisionQueryParams(FName(TEXT("")), false, GetOwner()));
+	GetWorld()->LineTraceSingleByObjectType(OUT Linetracehit, PlayerLocation, TraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), FCollisionQueryParams(FName(TEXT("")), false, GetOwner()));
 
-	AActor *FoundActor = Linetracehit.GetActor(); 
+	AActor *FoundActor = Linetracehit.GetActor();
 
 	if (FoundActor != NULL) {
 		UE_LOG(LogTemp, Warning, TEXT("You're tracing this object : %s"), *FoundActor->GetName());
@@ -57,5 +99,27 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Nothing found"));
 	}
+
+	return Linetracehit;
+}
+
+
+// Called every frame
+void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	FVector PlayerLocation;
+	FRotator PlayerRotation;
+
+	// Gets the player ViewPoint (Location, Rotation)
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
+	FVector TraceEnd = PlayerLocation + PlayerRotation.Vector()*100.f;
+
+	if (PhysicsHandle->GrabbedComponent) {
+		PhysicsHandle->SetTargetLocation(TraceEnd);
+	}
+
+
 }
 
