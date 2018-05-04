@@ -8,6 +8,7 @@
 #include "Components/ActorComponent.h"
 #include "OpenDoor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorEvent);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TUTORIAL_01_API UOpenDoor : public UActorComponent
@@ -23,24 +24,27 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void OpenDoor();
-	void CloseDoor();
+	
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UPROPERTY(BlueprintAssignable)
+	FDoorEvent OnOpen;
+
+	UPROPERTY(BlueprintAssignable)
+	FDoorEvent OnClose;
 
 	
 
 private :
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume *PressurePlate;
-	UPROPERTY(EditAnywhere)
-	float delaytime = 1.f;
+	
 	UPROPERTY(EditAnywhere)
 		float Massfortrigger = 60.f; 
 
-	float lastdooropentime;
 	float GetMassofTotalObjects();
 	AActor *Actorthatopens;
 	AActor *Owner = GetOwner();

@@ -10,7 +10,6 @@ UOpenDoor::UOpenDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 	// ...
 }
 
@@ -23,17 +22,6 @@ void UOpenDoor::BeginPlay()
 
 }
 
-void UOpenDoor::OpenDoor()
-{
-	Owner->SetActorRotation(FRotator(0.0f, 90.0f, 0.0f));
-}
-
-void UOpenDoor::CloseDoor()
-{	
-	
-	//Apllies Rotation
-	Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
-}
 
 
 // Called every frame
@@ -42,14 +30,11 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (GetMassofTotalObjects() > Massfortrigger) {
-		OpenDoor();
-		lastdooropentime = GetWorld()->GetTimeSeconds();
-
+		OnOpen.Broadcast();
 	}
-
-	if (GetWorld()->GetTimeSeconds() - lastdooropentime > delaytime)
-		CloseDoor();
-
+	else {
+		OnClose.Broadcast();
+	}
 	
 
 }
@@ -64,7 +49,6 @@ float UOpenDoor::GetMassofTotalObjects() {
 		UE_LOG(LogTemp, Warning, TEXT("The actor %s has a mass of : %f"), *actors->GetName(), actors->FindComponentByClass<UPrimitiveComponent>()->GetMass());
 	}
 	
-
 	return TotalMass; 
 }
 
