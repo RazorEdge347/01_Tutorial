@@ -56,11 +56,14 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 float UOpenDoor::GetMassofTotalObjects() {
 	float TotalMass = 0.f;
+	
 	TArray<AActor*> Overlappingactors;
 	PressurePlate->GetOverlappingActors(OUT Overlappingactors);
 	for (auto &actors : Overlappingactors) {
 		TotalMass += actors->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		UE_LOG(LogTemp, Warning, TEXT("The actor %s has a mass of : %f"), *actors->GetName(), actors->FindComponentByClass<UPrimitiveComponent>()->GetMass());
 	}
+	
 
 	return TotalMass; 
 }

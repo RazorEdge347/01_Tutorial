@@ -77,7 +77,7 @@ FTwoVectors UGrabber::GetTraceEnd()
 	// Gets the player ViewPoint (Location, Rotation)
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
 
-	UE_LOG(LogTemp, Warning, TEXT("Location : %s , Roatation : %s"), *PlayerLocation.ToString(), *PlayerRotation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Location : %s , Roatation : %s"), *PlayerLocation.ToString(), *PlayerRotation.ToString());
 
 	FVector TraceEnd = PlayerLocation + PlayerRotation.Vector()*100.f;
 	return FTwoVectors(PlayerLocation, TraceEnd);
